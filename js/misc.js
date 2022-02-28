@@ -73,7 +73,7 @@ function prettyFormat(value) {
   for (let i = 0; i < Units.length; i++) {
     const toCompare = TEN.pow(Units[i].exp);
     if (bigValue.gte(toCompare)) {
-      return `${bigValue.div(toCompare).toFixed(4)} ${Units[i].name}`;
+      return `${bigValue.div(toCompare).toFixed(3)} ${Units[i].name}`;
     }
   }
 }
@@ -82,7 +82,7 @@ function formatUnit(value, unitName) {
   const bigValue = new Big(value);
   for (let i = 0; i < Units.length; i++) {
     if (Units[i].name === unitName) {
-      return `${bigValue.div(TEN.pow(Units[i].exp)).toFixed(4)} ${unitName}`;
+      return `${bigValue.div(TEN.pow(Units[i].exp)).toFixed(3)} ${unitName}`;
     }
   }
   return value;

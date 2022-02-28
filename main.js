@@ -1,7 +1,7 @@
 const MAINNET = {
   url: 'https://main.confluxrpc.com',
   networkId: 1029,
-  poolAddress: 'cfx:acdj1y1r00mzvuw9s831rj1t5amst2405jv582syu0',
+  poolAddress: 'cfx:acc5086t6uyww6barn1a2b6z8wdmdg376yeu9gczpz',
   scan: 'https://confluxscan.io'
 };
 
@@ -420,3 +420,4 @@ Vue.createApp(PoSPool).mount('#app');
 
   return hashModal;
 } */
+
