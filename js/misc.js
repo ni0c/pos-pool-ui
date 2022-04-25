@@ -20,6 +20,14 @@ function formatDateTime(date) {
   return `${date.getFullYear()}-${paddingZero(date.getMonth() + 1)}-${paddingZero(date.getDate())} ${paddingZero(date.getHours())}:${paddingZero(date.getMinutes())}:${paddingZero(date.getSeconds())}`;
 }
 
+function formatTime(date) {
+  return `${paddingZero(date.getHours())}:${paddingZero(date.getMinutes())}:${paddingZero(date.getSeconds())}`;
+}
+
+function formatTimeW(date) {
+  return `${date.getFullYear()}-${paddingZero(date.getMonth()+1)}-${paddingZero(date.getDate())} ${paddingZero(date.getHours())}:${paddingZero(date.getMinutes())}:${paddingZero(date.getSeconds())}`;
+}
+
 function requestAccounts() {
   if (conflux.isFluent) {
     return conflux.request({
@@ -73,7 +81,9 @@ function prettyFormat(value) {
   for (let i = 0; i < Units.length; i++) {
     const toCompare = TEN.pow(Units[i].exp);
     if (bigValue.gte(toCompare)) {
-      return `${bigValue.div(toCompare).toFixed(3)} ${Units[i].name}`;
+      //let tval = bigValue.div(toCompare).toFixed(3);
+      let tval = Math.round(bigValue.div(toCompare)*100)/100;
+      return `${tval} ${Units[i].name}`;
     }
   }
 }

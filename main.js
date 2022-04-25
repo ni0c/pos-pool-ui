@@ -2,25 +2,31 @@ const MAINNET = {
   url: 'https://main.confluxrpc.com',
   networkId: 1029,
   poolAddress: 'cfx:acc5086t6uyww6barn1a2b6z8wdmdg376yeu9gczpz',
-  scan: 'https://confluxscan.io'
+  scan: 'https://confluxscan.io',
+  nftAddress: 'cfx:acaemjexx8xx33n9s9jndmyz2871e90x4jw3zfyphy',
 };
+
+let POS_address = '';
 
 const TESTNET = {
   url: 'https://test.confluxrpc.com',
   networkId: 1,
   poolAddress: '0x820e8a21ba781389f5715c7a04dba9847cfccb64',
-  scan: 'https://testnet.confluxscan.io'
+  scan: 'https://testnet.confluxscan.io',
+  nftAddress: 'cfxtest:achnjxz9rhvct9gsu87n54yept6zn9znt2mem6nmva',
 }
 
 /* const NET8888 = {
   url: 'https://net8888cfx.confluxrpc.com',
   networkId: 8888,
   poolAddress: '0x8e38f187da01d54936142a5f209d05c7e85fadff',
-  scan: ''
+  scan: '',
+  nftAddress: ""
 } */
 
 let currentChainId = MAINNET.networkId;
 let poolAddress = MAINNET.poolAddress;
+let nftAddress = MAINNET.nftAddress;
 let scanUrl = MAINNET.scan;
 
 let confluxClient = new TreeGraph.Conflux(MAINNET);
@@ -34,7 +40,8 @@ let appClient = new TreeGraph.Conflux(MAINNET);
 
 console.log('SDK version: ', confluxClient.version);
 
-var hashModal = new bootstrap.Modal(document.getElementById('hashModal'), {});
+let hashModal = new bootstrap.Modal(document.getElementById('hashModal'), {});
+let withdrawModal = new bootstrap.Modal(document.getElementById('withdrawModal'), {});
 
 const PoSPool = {
   data() {
@@ -57,12 +64,14 @@ const PoSPool = {
         balance: 0,
         connected: false,
         userStaked: BigInt(0),
+        available: BigInt(0),
         userInterest: 0,
         account: '',
         locked: BigInt(0),
         unlocked: BigInt(0),
         userInQueue: [],
         userOutOueue: [],
+        nftCount: 0,
       },
       stakeCount: 0,
       unstakeCount: 0,
@@ -79,6 +88,7 @@ const PoSPool = {
         confluxClient.provider = window.conflux;
         appClient = new TreeGraph.Conflux(TESTNET);
         poolAddress = TESTNET.poolAddress;
+        nftAddress = TESTNET.nftAddress;
         scanUrl = TESTNET.scan;
       }
       currentChainId = status.chainId;
@@ -88,17 +98,27 @@ const PoSPool = {
       abi: PoSPoolABI,
       address: poolAddress,
     });
-    
+
+    /*
+    this.nftContract = confluxClient.Contract({
+      abi: PoSNFTABI,
+      address: nftAddress
+    });
+    */
+
     // load pool info
-    this.loadPoolMetaInfo();
+    
     this.loadPoolInfo();
-    // await this.loadLastRewardInfo();
-    // await this.loadPosNodeStatus();
+    this.loadLastRewardInfo();
+    await this.loadPoolMetaInfo();
+    this.loadPosNodeStatus();
 
     // auto connect user
     if (window.conflux && localStorage.getItem('userConnected')) {
       await this._requestAccount();
     }
+
+    this.loadRewardData();
   },
 
   mounted () {
@@ -208,6 +228,7 @@ const PoSPool = {
       this.loadUserInfo();
       await this.loadLockingList();
       await this.loadUnlockingList();
+      //await this.loadNFTInfo();
       return account;
     },
 
@@ -225,6 +246,7 @@ const PoSPool = {
     async loadUserInfo() {
       const userSummary = await this.poolContract.userSummary(this.userInfo.account);
       this.userInfo.userStaked = BigInt(userSummary[0].toString());
+      this.userInfo.available = BigInt(userSummary[1].toString());
       this.userInfo.locked = BigInt(userSummary[2].toString());
       this.userInfo.unlocked = BigInt(userSummary[3].toString());
       // this.userInfo.userInterest = TreeGraph.Drip(userSummary[5].toString()).toCFX();
@@ -237,10 +259,11 @@ const PoSPool = {
 
     // only need load once
     async loadPoolMetaInfo() {
-      this.poolInfo.name = await this.poolContract.poolName();
+      // this.poolInfo.name = await this.poolContract.poolName();
       this.poolInfo.userShareRatio = await this.poolContract.poolUserShareRatio();
       let poolAddress = await this.poolContract.posAddress();
-      this.poolInfo.posAddress = TreeGraph.format.hex(poolAddress);
+      POS_address = TreeGraph.format.hex(poolAddress);
+      this.poolInfo.posAddress = POS_address;
     },
 
     async loadPosNodeStatus() {
@@ -248,9 +271,9 @@ const PoSPool = {
       this.poolInfo.status = account.status;
       // console.log(this.poolInfo.status);
 
-      const committee = await appClient.pos.getCommittee();
-      let nodes = committee.currentCommittee.nodes.map(item => item.address);
-      this.poolInfo.inCommittee = nodes.includes(this.poolInfo.posAddress);
+      // const committee = await appClient.pos.getCommittee();
+      // let nodes = committee.currentCommittee.nodes.map(item => item.address);
+      // this.poolInfo.inCommittee = nodes.includes(this.poolInfo.posAddress);
       // console.log(nodes);
     },
 
@@ -284,9 +307,18 @@ const PoSPool = {
       this.userInfo.userOutOueue = list.map(this.mapQueueItem);
     },
 
+    async loadNFTInfo() {
+      const count = await this.nftContract.balanceOf(this.userInfo.account);
+      this.userInfo.nftCount = Number(count.toString());
+    },
+
     async stake() {
       if (this.stakeCount === 0 || this.stakeCount % ONE_VOTE_CFX != 0 ) {
         alert('Stake count should be multiple of 1000');
+        return;
+      }
+      if (Number(this.userInfo.balance) < Number(this.stakeCount)) {
+        alert('Insufficient balance');
         return;
       }
 
@@ -380,44 +412,161 @@ const PoSPool = {
         return;
       }
 
-      let tx = this.poolContract
-      .withdrawStake(this.userInfo.unlocked.toString())
-      .sendTransaction({
-        from: this.userInfo.account,
-      });
+      try{
+        let tx = this.poolContract
+        .withdrawStake(this.userInfo.unlocked.toString())
+        .sendTransaction({
+          from: this.userInfo.account,
+        });
 
-      const hash = await tx;
-      this.txHash = hash;
-      hashModal.show();
+        const hash = await tx;
+        this.txHash = hash;
+        hashModal.show();
 
-      const receipt = await tx.executed();
-      hashModal.hide();
-      
-      if (receipt.outcomeStatus === 0) {
-        this.loadUserInfo();
-        // alert('Withdraw success');
-      } else {
-        alert('Withdraw failed');
+        const receipt = await tx.executed();
+        hashModal.hide();
+        
+        if (receipt.outcomeStatus === 0) {
+          this.loadUserInfo();
+          // alert('Withdraw success');
+        } else {
+          alert('Withdraw failed');
+        }
+      } catch(err) {
+        console.log("The unlock time is estimated by PoW block number is not very accurate. Your votes is still unlocking, please try again several hours later", err);
+        withdrawModal.show();
       }
+    },
+
+    loadRewardData() {
+      const posAddress = POS_address;
+      const url = `https://confluxscan.io/stat/list-pos-account-reward?identifier=${posAddress}&limit=40&orderBy=createdAt&reverse=true`;
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          initLineChart(data);
+        });
     }
   }
 };
 
 Vue.createApp(PoSPool).mount('#app');
 
-/* function updateHash(hash) {
-  const hashLink = document.getElementById('hashLink');
-  hashLink.href = `${scanUrl}/tx/${hash}`;
-  hashLink.innerText = hash.slice(0, 10) + '...';
-
-  const modalEle = document.getElementById('hashModal');
-  var hashModal = new bootstrap.Modal(modalEle, {});
-  // 
-
-  modalEle.addEventListener('hidden.bs.modal', function() {
-    hashModal.dispose();
+function initLineChart(rewards) {
+  const { list } = rewards;
+  //console.log(rewards);
+  //let labels = list.map(item => formatTimeW(new Date(item.createdAt)));
+  let labels = list.map(item => new Date(item.createdAt));
+  let labelsX = list.map(item => item.createdAt);
+  let items = list.map(item => {
+    const formated = formatUnit(item.reward, 'CFX');
+    const onlyValue = formated.split(' ')[0];
+    return Number(onlyValue);
   });
 
-  return hashModal;
-} */
+  let tdays = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday"
+  ];
+
+  labels = labels.reverse();
+  items = items.reverse();
+
+  //console.log(labels);
+  //console.log(items);
+
+  let thr = 25;
+  let tthisTime = -1;
+  let tthisDay = "X";
+
+  for(let i = 0; i < labelsX.length; i++) {
+    let tdate = labels[i];
+    let tndate = new Date();
+    let tnday = tndate.getDay();
+    let tday = tdate.getDay();
+    let thour = tdate.getHours();
+
+    if (tday == tnday)
+    {
+      if (thour < thr)
+      {
+        thr = thour;
+        tthisTime = labels[i];
+        tthisDay = tdays[tday];
+      }
+    }
+
+    
+  }
+
+  let _arr1 = [
+    ['x', ...labels],
+    ['CFX rewards per hour', ...items]
+  ];
+
+  document.getElementById('reward-chart-wrapper').removeAttribute('style');
+
+  //console.log("tthisTime", tthisTime, " tthisDay", tthisDay);
+
+  var chart = c3.generate({
+    bindto: "#reward-chart",
+    data: {
+      x: "x",
+      columns: _arr1,
+      type: "bar",
+      types: {
+        "CFX rewards per hour": "bar",
+      },
+      axes: {
+        "CFX rewards per hour": "y"
+      },
+      colors: {
+        "CFX rewards per hour": "#fd4c87",
+      },
+    },
+    grid: {
+      x: {
+        lines: [
+          { value: tthisTime, text: tthisDay}
+        ]
+      }
+    },
+    axis: {
+      "y": {
+          show: true,
+          label: "CFX rewards per hour"
+      },
+      x: {
+        type: "timeseries",
+        
+        tick: {
+          format: "%H:%M"
+        }
+      }
+    }
+  });
+}
+
+/*
+  function updateHash(hash) {
+    const hashLink = document.getElementById('hashLink');
+    hashLink.href = `${scanUrl}/tx/${hash}`;
+    hashLink.innerText = hash.slice(0, 10) + '...';
+
+    const modalEle = document.getElementById('hashModal');
+    var hashModal = new bootstrap.Modal(modalEle, {});
+    // 
+
+    modalEle.addEventListener('hidden.bs.modal', function() {
+      hashModal.dispose();
+    });
+
+    return hashModal;
+  } 
+*/
 

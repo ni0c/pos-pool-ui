@@ -13,8 +13,9 @@
                 <meta property="og:url" content="https://pos.webomatic.xyz/" /> 
                 <meta property="og:image" content="https://pos.webomatic.xyz/pos.png" />
 		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
-		<link rel="stylesheet" href="main.css?v1.03">
+		<link rel="stylesheet" href="https://unpkg.com/c3@0.7.20/c3.css" />
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" />
+		<link rel="stylesheet" href="main.css?v1.1" />
 	</head>
 
 	<body class="_bs2">
@@ -42,20 +43,52 @@
 
 			<div id="top-notice">
 				<div class="alert alert-primary" role="alert">
-					1. The PoS reward will start distributing after epochNumber 37400000.
+					<ul>
+						<li>
+							<strong style="color: white;">2022-04-25</strong>: 
+							<br /><br />
+							<strong style="color: white;">Staking is ONLINE!</strong> Also Webomatic PoS pool website is updated.
+							<br /><br />
+							<strong style="color: white;">Old stakers SHOULD withdraw and restake NOW!</strong> 
+							<br />
+							There are now over 1'000'000 CFX which can already be withdrawn and restaked, if you dont do this, you will NOT be gaining ANY REWARDS.
+							<br /><br />
+							
+						</li>
+						<li>Pool performance fee is  <strong style="color: #fff; font-size: 125%;">1.5%</strong>  of the Proof-of-Stake staking reward. The fee
+						 is the same for all stakers.</li>
+						<li>The first 200 stakers will receive a Webomatic PoS VIP NFT. 
+							<ul>
+								<li>First 100 will get Platinum NFT and 101-200 will get Golden NFT.</li>
+								<li>Also the stakers hit by the Force Retirement of PoS node will get an extra NFT with extra benefits included.</li>
+							</ul>
+							
+						</li>			
+					</ul>
+				</div>
+			</div>
+
+			<div id="reward-header">
+				<h4>CFX hourly Rewards Chart</h4>
+			</div>
+
+			<div id="reward-chart-wrapper">
+				<div id="reward-chart">
 					<br />
-					2. The earlier you stake, the higher the reward.
-					<br />
-					3. Pool performance fee is 3% of the PoS reward.
-					<br />
-					4. The first 200 stakers will receive a Webomatic PoS VIP NFT. First 100 will get Platinum NFT and 101-200 will get Golden NFT.
+					Loading Chart...
+					<br /><br />
+					<span role="status">
+						<svg class="stroke-light loader_pulse_circle large-circle">
+							<use xlink:href="#loader_pulse_circle" href="#loader_pulse_circle" />
+						</svg>
+					</span>
 					<br />
 				</div>
 			</div>
 
 			<div v-if="chainStatus.epochNumber" id="current-epoch">
 				<div class="alert alert-secondary" role="alert">
-					Current Epoch: {{chainStatus.epochNumber}}  -  Current Block: {{chainStatus.blockNumber}}
+					Current Epoch: {{chainStatus.epochNumber}}  -  Current Block: {{chainStatus.blockNumber}}
 				</div>
 			</div>
 
@@ -202,6 +235,23 @@
 					</div>
 				</div>
 			</div>
+
+			<div class="modal fade" id="withdrawModal" tabindex="-2" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header" style="border-bottom: none">
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>  
+            </div>
+            <div class="modal-body text-center">
+              <i class="bi-hourglass-split" style="font-size: 40px; color: cornflowerblue;"></i>
+              <br/>
+              <span>The unlock time is estimated by PoW block number is not very accurate. Your votes is still unlocking, please try again several hours later</span>
+              <div style="height: 50px"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
 			<div id="votes-container" v-if="userInfo.connected">
 
 				<h5>Locking votes</h5>
@@ -243,17 +293,44 @@
 			</div>
 			<div id="rules-container">
 				<ul>
-					<li>The Stake/Unstake CFX amount must be multiple of 1000 CFX</li>
-					<li>The Lock Period of Stake/Unstake is 7 Days</li>
+					<li>The Stake and Unstake CFX amount must be multiple of 1000 CFX.</li>
+					<li>The Lock Period of Stake and Unstake is 7 Days.</li>
 
-					<li>The pool performance fee is 3% of PoS reward.</li>
-					<li>The Reward Updates Every Hour after PoS Rewards start accruing (After Epoch 37400000).</li>
+					<li>The Pool Performance Fee is <strong style="color: #fff; font-size: 125%;">1.5%</strong> of PoS reward.</li>
+					<li>The Reward Updates Every Hour.</li>
 				</ul>
 			</div>
 
+			<div id="old-news-header">
+				<h4>Old Announcements</h4>
+			</div>
+			<div id="old-news">
+				<div class="alert alert-primary" role="alert">
+					<ul>
+						<li>
+							<strong style="color: white;">2022-03-18: </strong>
+							<br />
+							Webomatic PoS node encountered critical I/O error, because OS open file 
+							limits were met by the Conflux binary, which crashed the node and it got stuck infinitely, which in line caused the PoS Node to 
+							be force retired (time window for force retirement is only <strike>12h</strike> 1 hour when PoS node is inactive). <br />
+							Conversations have been had with the Conflux Development team to raise the force retired time window from the current in the next 
+							versions of Conflux node and also the other current issues should be mitigated in the next versions also.
+					</li>
+					<li>
+							<strong style="color: white;">2022-04-02</strong>:
+							<br />
+							Another Day Another Bug! The Proof-of-Stake Pool got hit by another bug in the Conflux Proof-of-Stake node software. The bug got 
+							the PoS pool again force retired in an hour. These issues have been fixed in new version of PoS node, but force retirement design 
+							is  not yet fixed but a fix for that is coming in the next version also. So any of the PoS pool might get force retired in 1 hour,
+							if for.ex. software issue/bug happens.
+						</li>
+					</ul>
+				</div>
+			</div>
+
 			<div id="footer-container">
-				<a class="footer-item" href="https://github.com/conflux-fans/pos-pool" target="_blank">Github Contracts</a>
-				<a class="footer-item" href="https://github.com/ni0c/pos-pool-ui" target="_blank">Github UI</a>
+				<a class="footer-item" href="https://github.com/conflux-fans/pos-pool" target="_blank"><i class="fab fa-github"></i> Github Contracts</a>
+				<a class="footer-item" href="https://github.com/ni0c/pos-pool-ui" target="_blank"><i class="fab fa-github"></i> Github UI</a>
 			</div>
 
 		</div>
@@ -261,13 +338,22 @@
 
 		<!-- scripts -->
 
-		<script src="https://unpkg.com/vue@3"></script>
-		<script src="https://cdn.jsdelivr.net/npm/big.js@6.0.0/big.min.js"></script>
-		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+		<script src="js/vue.global.js"></script>
+		<script src="js/big.min.js"></script>
+		<script src="js/d3.v5.min.js"></script>
+  	<script src="js/c3.min.js"></script>
 		<script src="js/js-conflux-sdk.umd.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 		<script src="js/PoolABI.js"></script>
 		<script src="js/misc.js"></script>
-		<script src="main.js?v1.03"></script>
+		<script src="main.js?id=v1.1"></script>
+
+		<svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="display: none;">
+      <svg id="loader_pulse_circle" width="44" height="44" viewBox="0 0 44 44"><g fill="none" fill-rule="evenodd" stroke-width="2"><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="0s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite" />                 <animate attributeName="stroke-opacity" begin="0s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite" /></circle><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="-0.9s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite" /><animate attributeName="stroke-opacity" begin="-0.9s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite" /></circle></g></svg>
+      <symbol id="palm_chain_svg">
+        <path style="stroke:none;" d="M29 69L29 70C19.479 71.4701 14.7027 85.0348 23.1088 91.2971C28.9629 95.6582 34.8701 92.6725 41 91L41 92C36.5566 93.2796 32.1566 95.2818 28.0008 97.3241C18.4074 102.039 14.7556 117.001 24.1852 124.146C29.2029 127.948 36.0931 127 42 127C55.9123 127 70.2536 129.438 75 113L76 113C76.0854 123.175 90.8852 135.648 97.821 122.941C101.576 116.062 94.568 112.966 93.9174 107.02C93.6701 104.759 95.6065 102.706 97.9144 103.06C107.669 104.556 107.792 138.09 124.772 125.258C129.576 121.627 128 113.251 128 108C128 92.1397 129.779 78.6543 111 75L111 74C115.492 73.997 120.126 74.2568 123.891 71.3472C135.976 62.008 123.524 51.007 113 51L113 50C123.242 45.6646 135.484 30.7002 123.671 20.804C119.108 16.9816 112.535 18 107 18C90.5112 18 79.7634 19.2178 77 38L76 38C76.2048 33.1557 77.3745 28.4863 74.6057 24.0934C64.4906 8.04462 45.2569 23.2422 51 39C46.3546 32.9772 40.5963 20.8566 32.9853 18.5139C19.8309 14.4649 15.1453 30.6692 21.0093 39.9568C25.1002 46.4362 35.4113 49.4463 42 52.7531C44.2933 53.9041 49.7932 55.7177 49.7932 58.9383C49.7932 62.2482 45.4383 60.3897 43.9992 59.5926C38.0722 56.3096 32.5395 49.4434 25.0046 51.3187C12.6044 54.4049 21.2958 66.9155 29 69z"/>
+      </symbol>
+    </svg>
 
 	</body>
 
