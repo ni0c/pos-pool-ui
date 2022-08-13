@@ -123,68 +123,6 @@ video::-webkit-media-controls-enclosure {
   text-align: left;
 }
 
-._bs2 #webomatic {
- 
-  color: rgba(250, 250, 250, 0.8);
-  margin-left: 1rem;
-  font-size: 1rem;
-  text-align: left;
-  margin-bottom: 1rem;
-  margin-top: 1rem;
-  font-family: Comfortaa;
-  display: inline-block;
-  position: relative;
-}
-
-._bs2 #webomatic #w_webo {
-  background: rgba(250, 250, 250, 0.8);
-  color:rgba(6, 0, 61, 0.95);
-  font-weight: bold;
-  border-radius: 3px;
-  padding: 6px;
-}
-
-._bs2 #webomatic:hover 
-{
-  color: rgba(250, 250, 250, 0.9);
-}
-
-._bs2 #webomatic:hover #w_webo 
-{
-  background: rgba(250, 250, 250, 0.9);
-  color:rgba(20, 20, 20, 0.95);
-}
-
-._bs2 #header-container h1#webohead {
-  font-size: 2rem;
-  color: rgba(20, 20, 20, 0.95);
-  border-radius: 20px;
-  display: inline-block;
-  padding: 0 1rem;
-  margin-bottom: 1rem;
-
-  background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-  background-size: 400% 400%;
-  animation: gradient 15s ease infinite;
-  height: 100%;
-  
-}
-
-@keyframes gradient {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-
-
-
 ._bs2 #top-notice .alert-primary {
   padding-top: 0.75rem;
   padding-bottom: 1rem;
@@ -684,12 +622,6 @@ video::-webkit-media-controls-enclosure {
   background-color: rgba(0, 94, 156, 0.4);
   border: 1px solid #00c3ff;
 }
-
-._bs2 .footer-item:hover .webomaticw {
-  background-color: #bdbdbd;
-}
-
-
 
 ._bs2 #votes-container {
   background-color: rgba(63, 24, 37, 0.35);
@@ -1344,17 +1276,6 @@ video::-webkit-media-controls-enclosure {
   cursor: pointer;
 }
 
-._bs2 .webomaticw {
-  background: rgba(250, 250, 250, 0.8);
-  color:rgba(6, 0, 61, 0.95);
-  font-weight: bold;
-  border-radius: 2px;
-  padding: 3px;
-  font-family: Comfortaa;
-  font-size: 1rem;
-}
-
-
 @media only screen and (max-width: 1180px) {
   ._bs2 .info-wrap {
     float: left;
@@ -1672,18 +1593,6 @@ video::-webkit-media-controls-enclosure {
     font-size: 0.8rem;
     margin-bottom: 1.5rem;
   }
-
-  ._bs2 #webomatic {
-    font-size: 0.75rem;
-    margin-bottom: 0.75rem;
-    margin-top: 0.75rem;
-    margin-left: 0.25rem;
-  }
-  
-  ._bs2 #webomatic #w_webo {
-    border-radius: 2.5px;
-    padding: 5px;
-  }   
 
   ._bs2 #top-bar-conf-btn {
     font-size: 1.25rem;
