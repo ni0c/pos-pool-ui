@@ -1,3 +1,3 @@
 # Conflux-PoS-pool-UI
 
-The Dapp UI for PoS pool
+The Dual Network Dapp UI for Conflux PoS pool
