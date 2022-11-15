@@ -439,8 +439,6 @@ const posPool = {
         updateUItable(_id, _str);
         break;
       case 'votes':
-        updateUIData2(_id, Number(val));
-        break;
       case 'available':
       case 'locked':
       case 'unlocked':
@@ -937,6 +935,7 @@ $(function () {
 
   $("#top-bar-conf-btn").click(function() {
     $("#top-bar-conf-cmds").toggle();
+    $("#top-bar-conf-btn").toggleClass("btn-is-active");
 	});
   
 
